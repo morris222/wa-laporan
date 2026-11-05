@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>WA Laporan Malam</title><style>body{font-family:sans-serif;padding:15px;background:#f5f5f5}.card{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px}input,textarea{width:100%;padding:10px;margin:5px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}button{padding:12px;background:#25D366;color:#fff;border:0;border-radius:8px;width:100%;cursor:pointer}</style></head><body>
+<h2>Bot Laporan Malam</h2>
+<div class="card"><div id="status">Loading...</div><img id="qr" style="width:250px;display:none"/></div>
+<div class="card">
+<label>Nomor Tujuan (628xxxx)</label><input id="target"/>
+<label>Jam Laporan (contoh: 23:00,03:00)</label><input id="jadwal"/>
+<label>Ulang Berapa Kali</label><input id="ulang" type="number" value="3"/>
+<label>Delay Antar Pesan (detik)</label><input id="delay" type="number" value="2"/>
+<label>Teks Laporan</label><textarea id="teks" rows="5"></textarea>
+<label>Upload Gambar</label><input type="file" id="imgs" multiple/>
+<button onclick="upload()">Upload Gambar</button>
+<button onclick="clearImg()" style="background:#888;margin-top:5px">Hapus Semua Gambar</button>
+<div id="listImg"></div>
+<button onclick="save()" style="margin-top:10px">Simpan & Aktifkan Jadwal</button>
+<button onclick="test()" style="background:#0088ff;margin-top:5px">Test Kirim Sekarang</button>
+</div>
+<script>
+async function load(){let r=await fetch('/api/status');let j=await r.json();document.getElementById('status').innerHTML=j.connected?'✅ Terhubung':'❌ Belum Scan QR';if(j.qr){document.getElementById('qr').style.display='block';document.getElementById('qr').src=j.qr;}else document.getElementById('qr').style.display='none';if(j.config){target.value=j.config.target;jadwal.value=j.config.jadwal.join(',');teks.value=j.config.teks;ulang.value=j.config.ulang;delay.value=j.config.delay;listImg.innerHTML=j.config.images.join('<br>');}}
+async function save(){await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:target.value,jadwal:jadwal.value.split(',').map(s=>s.trim()),teks:teks.value,ulang:parseInt(ulang.value),delay:parseInt(delay.value)})});alert('Disimpan!');}
+async function upload(){let fd=new FormData();for(let f of imgs.files)fd.append('images',f);await fetch('/api/upload',{method:'POST',body:fd});load();}
+async function clearImg(){await fetch('/api/clear-images',{method:'POST'});load();}
+async function test(){await fetch('/api/test',{method:'POST'});alert('Test dikirim!');}
+load();setInterval(load,3000);
+</script></body></html>
