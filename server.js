@@ -16,6 +16,40 @@ app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
+const { Client } = require('whatsapp-web.js');
+
+// Create a new client instance
+const client = new Client();
+
+// When the client is ready, run this code (only once)
+client.once('ready', () => {
+    console.log('Client is ready!');
+});
+
+// When the client received QR-Code
+client.on('qr', (qr) => {
+    console.log('QR RECEIVED', qr);
+});
+
+// Start your client
+client.initialize();
+
+const { Client } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+
+const client = new Client();
+
+client.on('ready', () => {
+    console.log('Client is ready!');
+});
+
+client.on('qr', qr => {
+    qrcode.generate(qr, {small: true});
+});
+
+client.initialize();
+
+
 const db = new Low(new JSONFile("db.json"), {
   config: {
     target: "",
