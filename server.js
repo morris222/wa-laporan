@@ -49,6 +49,7 @@ client.on('qr', qr => {
 
 client.initialize();
 
+npm install qrcode-terminal
 
 const db = new Low(new JSONFile("db.json"), {
   config: {
